@@ -140,3 +140,10 @@ func TestFindEntries(t *testing.T) {
 		t.Errorf("want: %+v, but got %+v\n", want, got)
 	}
 }
+
+func TestExtractText(t *testing.T) {
+	ts := httptest.NewServer(http.FileServer(http.Dir(".")))
+	defer ts.Close()
+
+	got, err := extractText(ts.URL + "/testdata/example.txt")
+}
