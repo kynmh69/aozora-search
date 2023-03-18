@@ -145,5 +145,15 @@ func TestExtractText(t *testing.T) {
 	ts := httptest.NewServer(http.FileServer(http.Dir(".")))
 	defer ts.Close()
 
-	got, err := extractText(ts.URL + "/testdata/example.txt")
+	got, err := extractText(ts.URL + "/testdata/example.zip")
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	want := "テストデータ\n"
+
+	if want != got {
+		t.Errorf("want %+v, but got %+v\n", want, got)
+	}
 }
