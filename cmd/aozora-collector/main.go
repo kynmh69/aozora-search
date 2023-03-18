@@ -3,6 +3,7 @@ package main
 import (
 	"archive/zip"
 	"bytes"
+	"database/sql"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -24,6 +25,18 @@ type Entry struct {
 	Title    string
 	InfoURL  string
 	ZipURL   string
+}
+
+func setupDB(dsn string) (*sql.DB, error) {
+	db, err := sql.Open("sqlite3", dsn)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	queries := []string{
+		`create table`,
+	}
 }
 
 func findEntries(siteURL string) ([]Entry, error) {
