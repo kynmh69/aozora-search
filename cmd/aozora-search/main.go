@@ -6,11 +6,14 @@ import (
 	"fmt"
 	"log"
 	"os"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 const dataSourceName = "database.sql"
 
 func main() {
+	usage := "aaaaaa"
 	var dsn string
 	flag.StringVar(&dsn, "d", dataSourceName, "database")
 	flag.Usage = func() {
@@ -57,4 +60,61 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func queryContent(db *sql.DB, s string) error {
+	rows, err := db.Query(s)
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		var author_id, title_id, title, content string
+		rows.Scan(&author_id, &title_id, &title, &content)
+		log.Println(author_id, title_id, title, content)
+	}
+	return nil
+}
+
+func showContent(db *sql.DB, s1, s2 string) error {
+	query := "select (author_id, title_id, title, content) from contents where author_id = ? and where title_id = ?"
+	rows, err := db.Query(query, s1, s2)
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		var author_id, title_id, title, content string
+		rows.Scan(&author_id, &title_id, &title, &content)
+		log.Println(author_id, title_id, title, content)
+	}
+	return nil
+}
+
+func showTitles(db *sql.DB, s string) error {
+	query := "select (author_id, title_id, title, content) from contents where author_id = ?"
+	rows, err := db.Query(query, s)
+	if err != nil {
+		return err
+	}
+	for rows.Next() {
+		var author_id, title_id, title, content string
+		rows.Scan(&author_id, &title_id, &title, &content)
+		log.Println(author_id, title_id, title, content)
+	}
+	return nil
+}
+
+func showAuthers(db *sql.DB) error {
+	query := "select author_id, author from authors"
+	rows, err := db.Query(query)
+
+	if err != nil {
+		return err
+	}
+
+	for rows.Next() {
+		var author_id, author string
+		rows.Scan(&author_id, &author)
+		log.Println(author_id, author)
+	}
+	return nil
 }
