@@ -4,8 +4,6 @@ go 1.20
 
 require golang.org/x/text v0.8.0
 
-require github.com/ikawaha/kagome v1.11.2
-
 require github.com/ikawaha/kagome-dict v1.0.9 // indirect
 
 require (
