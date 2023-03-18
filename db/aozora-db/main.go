@@ -17,14 +17,14 @@ func main() {
 	db, err := sql.Open("sqlite3", "database.sqlite")
 
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("not open db. err")
 	}
 
 	defer db.Close()
 
 	queries := []string{
 		`create table if not exists authors(author_id TEXT, author TEXT, PRIMARY KEY(author_id))`,
-		`create table if not exists contents(author_id TEXT, title_id TEXT, title TEXT, content TEXT PRIMARY KEY(autnor_id, title_id))`,
+		`create table if not exists contents(author_id TEXT, title_id TEXT, title TEXT, content TEXT, PRIMARY KEY(author_id, title_id))`,
 		`create virtual table if not exists contents_fts USING fts4(words)`,
 	}
 	for _, q := range queries {
@@ -78,7 +78,8 @@ func main() {
 	query := "虫 AND ココア"
 	rows, err := db.Query(`
 	select 
-		a.author, c.content
+		a.author, 
+		c.title
 	from
 		contents c 
 	inner join 
@@ -87,7 +88,7 @@ func main() {
 	inner join 
 		contents_fts f 
 			on c.rowid = f.docid 
-	and words MATCH ?
+			and words MATCH ?
 	`,
 		query,
 	)
