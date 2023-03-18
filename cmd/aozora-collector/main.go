@@ -55,7 +55,7 @@ func setupDB(dsn string) (*sql.DB, error) {
 }
 
 func addEntry(db *sql.DB, entry *Entry, content string) error {
-	_, err := db.Exec("INSERT INTO authors(author_id, author) values (?, ?)", entry.AuthorID, entry.Author)
+	_, err := db.Exec("REPLACE INTO authors(author_id, author) values (?, ?)", entry.AuthorID, entry.Author)
 	if err != nil {
 		return err
 	}
