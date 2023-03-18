@@ -13,8 +13,10 @@ import (
 	"golang.org/x/text/encoding/japanese"
 )
 
+const dataSourceName = "database.sqlite"
+
 func main() {
-	db, err := sql.Open("sqlite3", "database.sqlite")
+	db, err := sql.Open("sqlite3", dataSourceName)
 
 	if err != nil {
 		log.Fatalln("not open db. err")
@@ -85,19 +87,17 @@ func main() {
 	arg := "虫 AND ココア"
 
 	query := `
-	SELECT 
-		a.author, 
+	SELECT
+		a.author,
 		c.title
-	FROM 
-		contents c 
-	INNER JOIN 
-		authors a 
-			on a.author_id = c.author_id 
-	INNER JOIN 
-		contents_fts f 
-			ON c.rowid = f.docid 
-			AND words MATCH ?
-	`
+	FROM
+		contents c
+	INNER JOIN authors a
+		ON a.author_id = c.author_id
+	INNER JOIN contents_fts f
+		ON c.rowid = f.docid
+		AND words MATCH ?
+`
 	rows, err := db.Query(query, arg)
 
 	if err != nil {
@@ -119,5 +119,10 @@ func main() {
 	}
 
 	fmt.Println("script done.")
+	err = os.Remove(dataSourceName)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 }
