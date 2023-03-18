@@ -49,7 +49,7 @@ func main() {
 
 	content := string(b)
 
-	res, err := db.Exec(
+	res, _ := db.Exec(
 		`insert into contents(author_id, title_id, title, content) values (?, ?, ?, ?)`,
 		"000879", "14", "あばばばば", content,
 	)
@@ -85,18 +85,18 @@ func main() {
 	arg := "虫 AND ココア"
 
 	query := `
-	select 
+	SELECT 
 		a.author, 
 		c.title
-	from
+	FROM 
 		contents c 
-	inner join 
-		authors a
+	INNER JOIN 
+		authors a 
 			on a.author_id = c.author_id 
-	inner join 
+	INNER JOIN 
 		contents_fts f 
-			on c.rowid = f.docid 
-			and words MATCH ?
+			ON c.rowid = f.docid 
+			AND words MATCH ?
 	`
 	rows, err := db.Query(query, arg)
 
@@ -110,7 +110,7 @@ func main() {
 
 	for rows.Next() {
 		var author, title string
-		err := rows.Scan(&author, &title)
+		err = rows.Scan(&author, &title)
 		if err != nil {
 			log.Fatalln(err)
 		}
