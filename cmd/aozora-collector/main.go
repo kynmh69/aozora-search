@@ -30,7 +30,11 @@ type Entry struct {
 	ZipURL   string
 }
 
-const dataSourceName = "database.sql"
+const (
+	dataSourceName = "database.sql"
+)
+
+var pageURLFormat = "https://www.aozora.gr.jp/cards/%s/card%s.html"
 
 func setupDB(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", dsn)
@@ -103,10 +107,10 @@ func findEntries(siteURL string) ([]Entry, error) {
 		if len(token) != 3 {
 			return
 		}
-		fmt.Println(title, attrOr)
-		pageURL := fmt.Sprintf("https://www.aozora.gr.jp/cards/%s/card%s.html", token[1], token[2])
-		fmt.Println(pageURL)
-		auther, zipURL := findAutherAndZIP(pageURL)
+		log.Println(title, attrOr)
+		pageURL := fmt.Sprintf(pageURLFormat, token[1], token[2])
+		log.Println(pageURL)
+		auther, zipURL := fi1ndAuthorAndZIP(pageURL)
 
 		if zipURL != "" {
 			entries = append(entries, Entry{
@@ -123,12 +127,13 @@ func findEntries(siteURL string) ([]Entry, error) {
 	return entries, nil
 }
 
-func findAutherAndZIP(pageURL string) (string, string) {
+func fi1ndAuthorAndZIP(pageURL string) (string, string) {
 	doc, err := goquery.NewDocument(pageURL)
 	if err != nil {
 		return "", ""
 	}
-	auther := doc.Find("table[summary=作家データ] tr:nth-child(1) td:nth-child(2)").Text()
+	auther := doc.Find("table[summary=作家データ] tr:nth-child(2) td:nth-child(2)").Text()
+	log.Println("author:", auther)
 	zipURL := ""
 	doc.Find("table.download a").Each(func(_ int, s *goquery.Selection) {
 		href := s.AttrOr("href", "")
