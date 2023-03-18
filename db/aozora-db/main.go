@@ -33,16 +33,19 @@ func main() {
 			log.Fatalln(err)
 		}
 	}
+	fmt.Println("create db")
 
 	b, err := os.ReadFile("../../contents/ababababa.txt")
 	if err != nil {
 		log.Fatalln(err)
 	}
+	fmt.Println("read file.")
 
 	b, err = japanese.ShiftJIS.NewDecoder().Bytes(b)
 	if err != nil {
 		log.Fatalln(err)
 	}
+	fmt.Println("decode shift jis.")
 
 	content := string(b)
 
@@ -53,11 +56,13 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	fmt.Println("insert data.")
 
 	docID, err := res.LastInsertId()
 	if err != nil {
 		log.Fatalln(err)
 	}
+	fmt.Println("get docid", docID)
 
 	t, err := tokenizer.New(ipa.Dict(), tokenizer.OmitBosEos())
 	if err != nil {
@@ -65,6 +70,8 @@ func main() {
 	}
 
 	seg := t.Wakati(content)
+
+	fmt.Println("done wakati", seg)
 
 	_, err = db.Exec(
 		`insert into contents_fts(docid, words) values (?, ?)`,
@@ -75,8 +82,9 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	query := "虫 AND ココア"
-	rows, err := db.Query(`
+	arg := "虫 AND ココア"
+
+	query := `
 	select 
 		a.author, 
 		c.title
@@ -89,13 +97,14 @@ func main() {
 		contents_fts f 
 			on c.rowid = f.docid 
 			and words MATCH ?
-	`,
-		query,
-	)
+	`
+	rows, err := db.Query(query, arg)
 
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	fmt.Println("query done.", query)
 
 	defer rows.Close()
 
@@ -108,5 +117,7 @@ func main() {
 
 		fmt.Println(author, title)
 	}
+
+	fmt.Println("script done.")
 
 }
